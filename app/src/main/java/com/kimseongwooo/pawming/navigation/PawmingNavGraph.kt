@@ -59,7 +59,7 @@ fun PawmingNavGraph() {
         NavDisplay(
             backStack = activeBackStack,
             modifier = Modifier.padding(innerPadding),
-            onBack = { _ -> activeBackStack.removeLastOrNull() },
+            onBack = { activeBackStack.removeLastOrNull() },
             entryProvider = entryProvider {
                 homeNavEntries(
                     onNavigateToAnimalDetail = { homeBackStack.add(AnimalDetailRoute(it)) }

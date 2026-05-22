@@ -6,11 +6,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.kimseongwooo.pawming.feature.shelterdetail.ShelterDetailRoute
 
-fun EntryProviderBuilder<*>.shelterDetailNavEntries(
+fun EntryProviderScope<NavKey>.shelterDetailNavEntries(
     onBack: () -> Unit
 ) {
     entry<ShelterDetailRoute> { route ->
