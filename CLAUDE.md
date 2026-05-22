@@ -40,31 +40,84 @@
 
 ## 아키텍처
 
-### 디렉토리 구조
+### 멀티 모듈 구조
 
 ```
-app/
-├── data/           ← 데이터 계층
-│   ├── api/        ← Retrofit API 인터페이스
-│   ├── dto/        ← API 응답 DTO
-│   ├── mapper/     ← DTO → Domain 모델 매핑
-│   ├── repository/ ← Repository 구현체
-│   └── local/      ← Room DB, DataStore
-├── domain/         ← 도메인 계층
-│   ├── model/      ← 도메인 모델
-│   ├── repository/ ← Repository 인터페이스
-│   └── usecase/    ← UseCase
-├── presentation/   ← UI 계층
-│   ├── home/       ← 홈 화면 (Screen, ViewModel)
-│   ├── search/     ← 검색 화면
-│   ├── favorites/  ← 즐겨찾기 화면
-│   ├── shelter/    ← 보호센터 화면
-│   ├── detail/     ← 동물 상세 / 센터 상세
-│   ├── components/ ← 공통 Composable
-│   └── theme/      ← 디자인 시스템 (Color, Type, Shape)
-├── di/             ← Hilt 모듈
-└── navigation/     ← Navigation Graph
+:app                    ← NavGraph 조립 · Activity · DI 진입점
+:design-system          ← 공통 Composable · 테마 (Color, Type, Shape)
+:model                  ← 도메인 모델 (순수 Kotlin)
+:domain                 ← Repository 인터페이스 · UseCase
+:data                   ← Repository 구현체 · Room · DataStore
+:network                ← Retrofit API 서비스 · DTO · NetworkModule
+:feature:home:api       ← HomeRoute (NavKey)
+:feature:home:impl      ← HomeScreen · homeNavEntries()
+:feature:favorites:api  ← FavoritesRoute
+:feature:favorites:impl ← FavoritesScreen · favoritesNavEntries()
+:feature:shelter:api    ← ShelterRoute
+:feature:shelter:impl   ← ShelterScreen · shelterNavEntries()
+:feature:animal-detail:api   ← AnimalDetailRoute(desertionNo)
+:feature:animal-detail:impl  ← AnimalDetailScreen · animalDetailNavEntries()
+:feature:shelter-detail:api  ← ShelterDetailRoute(careRegNo)
+:feature:shelter-detail:impl ← ShelterDetailScreen · shelterDetailNavEntries()
 ```
+
+---
+
+## 네비게이션 구조
+
+> **화면 네비게이션 작업 시 항상 `/navigation-3` skill을 먼저 로드하세요.**
+
+### api/impl 분리 원칙
+
+각 feature 모듈은 두 개의 Gradle 모듈로 분리됩니다.
+
+| 모듈 | 역할 | 포함 내용 |
+|------|------|-----------|
+| `:feature:xxx:api` | NavKey 소유 | `XxxRoute : NavKey` (`@Serializable`) |
+| `:feature:xxx:impl` | Screen + 연결 | `XxxScreen` · `EntryProviderBuilder.xxxNavEntries()` |
+
+**의존 규칙:**
+- `:feature:xxx:impl` → `:feature:xxx:api` (자신의 Route import)
+- 크로스 피처 이동 (예: HomeScreen → 동물 상세) 시 → `:feature:home:impl`에 `:feature:animal-detail:api`만 추가 (impl 전체 불필요)
+- `:app` → `:feature:xxx:impl` (impl이 api를 전이 의존으로 포함)
+
+### NavGraph 조립 패턴
+
+`:app`의 `PawmingNavGraph`가 `EntryProviderBuilder` 확장 함수로 전체를 조립합니다.
+
+```kotlin
+// :app/navigation/PawmingNavGraph.kt
+NavDisplay(
+    entryProvider = entryProvider {
+        homeNavEntries(
+            onNavigateToAnimalDetail = { desertionNo ->
+                homeBackStack.add(AnimalDetailRoute(desertionNo))
+            }
+        )
+        animalDetailNavEntries(onBack = { activeBackStack.removeLastOrNull() })
+        // ...
+    }
+)
+```
+
+- 탭별 독립 backstack (`rememberNavBackStack`) → 탭 전환 시 각 탭의 히스토리 유지
+- 크로스 피처 이동 콜백은 `:app`이 람다로 제공 → feature 모듈 간 직접 의존 없음
+
+### Navigation3 skill 참조 항목
+
+| 작업 | 참고 레시피 |
+|------|------------|
+| 새 화면/Route 추가 | `modular-hilt.md` — api/impl 분리 패턴 |
+| 탭별 독립 백스택 | `multiple-backstacks.md` |
+| 다이얼로그 화면 | `dialog.md` |
+| BottomSheet 화면 | `bottomsheet.md` |
+| 딥링크 처리 | `deeplinks-basic.md` · `deeplinks-advanced.md` |
+| 화면 전환 애니메이션 | `animations.md` |
+| 조건부 네비게이션 (로그인 게이트) | `conditional.md` |
+| 화면 간 결과 전달 | `results-event.md` · `results-state.md` |
+| ViewModel에 인자 전달 | `passingarguments.md` |
+
+---
 
 ### 데이터 흐름
 
@@ -258,6 +311,7 @@ object PawmingColors {
 
 | 패턴 / 상황 | Skill |
 |-------------|-------|
+| 화면 추가 · Route · NavGraph · 백스택 · 딥링크 · 애니메이션 | `/navigation-3` |
 | StateFlow · SharedFlow · Channel · SideEffect 모델링 | `/kotlin-flow-state-event-modeling` |
 | Screen Composable ↔ ViewModel 분리 (MVI 레이어) | `/compose-state-holder-ui-split` |
 | LaunchedEffect · DisposableEffect · snapshotFlow · Flow 수집 | `/compose-side-effects` |
