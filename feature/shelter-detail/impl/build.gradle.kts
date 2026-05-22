@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:shelter-detail:api"))
+    api(project(":feature:shelter-detail:api"))
     implementation(project(":design-system"))
     implementation(project(":domain"))
     implementation(platform(libs.androidx.compose.bom))

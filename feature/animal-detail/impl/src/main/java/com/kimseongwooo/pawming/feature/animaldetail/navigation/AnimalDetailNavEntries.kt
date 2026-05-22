@@ -10,7 +10,7 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.entry
 import com.kimseongwooo.pawming.feature.animaldetail.AnimalDetailRoute
 
-fun EntryProviderBuilder.animalDetailNavEntries(
+fun EntryProviderBuilder<*>.animalDetailNavEntries(
     onBack: () -> Unit
 ) {
     entry<AnimalDetailRoute> { route ->

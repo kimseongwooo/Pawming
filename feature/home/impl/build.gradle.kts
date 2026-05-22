@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:home:api"))
+    api(project(":feature:home:api"))
     implementation(project(":design-system"))
     implementation(project(":domain"))
     implementation(platform(libs.androidx.compose.bom))

@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:animal-detail:api"))
+    api(project(":feature:animal-detail:api"))
     implementation(project(":design-system"))
     implementation(project(":domain"))
     implementation(platform(libs.androidx.compose.bom))

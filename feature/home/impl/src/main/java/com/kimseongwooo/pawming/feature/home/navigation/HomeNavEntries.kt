@@ -10,7 +10,7 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.entry
 import com.kimseongwooo.pawming.feature.home.HomeRoute
 
-fun EntryProviderBuilder.homeNavEntries(
+fun EntryProviderBuilder<*>.homeNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit
 ) {
     entry<HomeRoute> {

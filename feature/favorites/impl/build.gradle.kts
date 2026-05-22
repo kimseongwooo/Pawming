@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:favorites:api"))
+    api(project(":feature:favorites:api"))
     implementation(project(":design-system"))
     implementation(project(":domain"))
     implementation(platform(libs.androidx.compose.bom))

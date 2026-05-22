@@ -10,7 +10,7 @@ import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.entry
 import com.kimseongwooo.pawming.feature.favorites.FavoritesRoute
 
-fun EntryProviderBuilder.favoritesNavEntries(
+fun EntryProviderBuilder<*>.favoritesNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit
 ) {
     entry<FavoritesRoute> {
