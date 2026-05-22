@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -28,44 +27,30 @@ import com.kimseongwooo.pawming.feature.shelter.navigation.shelterNavEntries
 import com.kimseongwooo.pawming.feature.shelterdetail.ShelterDetailRoute
 import com.kimseongwooo.pawming.feature.shelterdetail.navigation.shelterDetailNavEntries
 
-private enum class Tab(
-    val label: String,
-    val startRoute: NavKey
-) {
-    Home("홈", HomeRoute),
-    Favorites("즐겨찾기", FavoritesRoute),
-    Shelter("보호센터", ShelterRoute)
-}
-
 @Composable
 fun PawmingNavGraph() {
-    var selectedTab by rememberSaveable { mutableStateOf(Tab.Home) }
+    var selectedTab by rememberSaveable { mutableStateOf(TopLevelTab.Home) }
 
+    // 탭별 독립 backstack — @Serializable NavKey 덕분에 프로세스 재시작 후에도 복원됨
     val homeBackStack = rememberNavBackStack(HomeRoute)
     val favoritesBackStack = rememberNavBackStack(FavoritesRoute)
     val shelterBackStack = rememberNavBackStack(ShelterRoute)
 
     val activeBackStack = when (selectedTab) {
-        Tab.Home -> homeBackStack
-        Tab.Favorites -> favoritesBackStack
-        Tab.Shelter -> shelterBackStack
+        TopLevelTab.Home -> homeBackStack
+        TopLevelTab.Favorites -> favoritesBackStack
+        TopLevelTab.Shelter -> shelterBackStack
     }
 
     Scaffold(
         bottomBar = {
             PawmingBottomNav {
-                Tab.entries.forEach { tab ->
+                TopLevelTab.entries.forEach { tab ->
                     PawmingBottomNavItem(
                         selected = selectedTab == tab,
                         onClick = { selectedTab = tab },
                         label = tab.label,
-                        icon = { active ->
-                            when (tab) {
-                                Tab.Home -> PawmingHomeIcon(active = active)
-                                Tab.Favorites -> PawmingHeartIcon(active = active)
-                                Tab.Shelter -> PawmingShelterIcon(active = active)
-                            }
-                        }
+                        icon = { active -> tab.Icon(active) }
                     )
                 }
             }
@@ -77,19 +62,13 @@ fun PawmingNavGraph() {
             onBack = { _ -> activeBackStack.removeLastOrNull() },
             entryProvider = entryProvider {
                 homeNavEntries(
-                    onNavigateToAnimalDetail = { desertionNo ->
-                        homeBackStack.add(AnimalDetailRoute(desertionNo))
-                    }
+                    onNavigateToAnimalDetail = { homeBackStack.add(AnimalDetailRoute(it)) }
                 )
                 favoritesNavEntries(
-                    onNavigateToAnimalDetail = { desertionNo ->
-                        favoritesBackStack.add(AnimalDetailRoute(desertionNo))
-                    }
+                    onNavigateToAnimalDetail = { favoritesBackStack.add(AnimalDetailRoute(it)) }
                 )
                 shelterNavEntries(
-                    onNavigateToShelterDetail = { careRegNo ->
-                        shelterBackStack.add(ShelterDetailRoute(careRegNo))
-                    }
+                    onNavigateToShelterDetail = { shelterBackStack.add(ShelterDetailRoute(it)) }
                 )
                 animalDetailNavEntries(
                     onBack = { activeBackStack.removeLastOrNull() }
@@ -99,5 +78,18 @@ fun PawmingNavGraph() {
                 )
             }
         )
+    }
+}
+
+private enum class TopLevelTab(val label: String) {
+    Home("홈"),
+    Favorites("즐겨찾기"),
+    Shelter("보호센터");
+
+    @Composable
+    fun Icon(active: Boolean) = when (this) {
+        Home -> PawmingHomeIcon(active = active)
+        Favorites -> PawmingHeartIcon(active = active)
+        Shelter -> PawmingShelterIcon(active = active)
     }
 }
