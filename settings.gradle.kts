@@ -24,5 +24,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Pawming"
 include(":app")
+include(":model")
+include(":domain")
+include(":data")
 include(":network")
  
