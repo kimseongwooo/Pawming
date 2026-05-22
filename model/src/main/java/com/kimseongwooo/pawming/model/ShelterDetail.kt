@@ -1,0 +1,32 @@
+package com.kimseongwooo.pawming.model
+
+data class ShelterDetail(
+    val careRegNo: String,
+    val careNm: String,
+    val orgNm: String,
+    val divisionNm: String,
+    val saveTrgtAnimal: String,
+    val careAddr: String,
+    val jibunAddr: String,
+    val lat: Double?,
+    val lng: Double?,
+    val dsignationDate: String,
+    val careTel: String,
+    val dataStdDt: String,
+    val weekOprStime: String,
+    val weekOprEtime: String,
+    val weekCellStime: String,
+    val weekCellEtime: String,
+    val weekendOprStime: String,
+    val weekendOprEtime: String,
+    val weekendCellStime: String,
+    val weekendCellEtime: String,
+    val closeDay: String,
+    val vetPersonCnt: Int,
+    val specsPersonCnt: Int,
+    val medicalCnt: Int,
+    val breedCnt: Int,
+    val quarantineCnt: Int,
+    val feedCnt: Int,
+    val transCarCnt: Int
+)
