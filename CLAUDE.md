@@ -135,6 +135,35 @@ data class ResponseBodyNetworkModel<T>(
 
 ---
 
+## Composable 파라미터 순서 규칙
+
+`@Composable` 함수의 파라미터는 아래 순서를 따릅니다.
+
+```
+필수 데이터 파라미터 → 필수 이벤트 람다(onClick 등) → modifier: Modifier = Modifier → 선택 파라미터 → trailing content/slot 람다
+```
+
+```kotlin
+// 올바른 예
+fun AnimalCard(
+    processState: String,       // 필수 데이터
+    kindNm: String,             // 필수 데이터
+    onClick: () -> Unit,        // 필수 이벤트 람다
+    modifier: Modifier = Modifier,
+    thumbnail: @Composable BoxScope.() -> Unit  // trailing slot
+)
+
+// 잘못된 예 — modifier가 필수 파라미터보다 앞에 위치
+fun AnimalCard(
+    modifier: Modifier = Modifier,
+    thumbnail: @Composable BoxScope.() -> Unit,
+    processState: String,
+    ...
+)
+```
+
+---
+
 ## 디자인 시스템
 
 ### 컬러 — Warm Coral 기반
