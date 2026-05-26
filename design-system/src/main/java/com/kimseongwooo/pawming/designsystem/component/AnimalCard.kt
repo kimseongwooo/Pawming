@@ -143,11 +143,8 @@ private fun FavoriteButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bgColor = if (isFavorite) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-    } else {
-        Color.Black.copy(alpha = 0.3f)
-    }
+    val bgColor = if (isFavorite) Color.White.copy(alpha = 0.75f) else Color.Black.copy(alpha = 0.3f)
+    val iconTint = if (isFavorite) MaterialTheme.colorScheme.primary else Color.White
     Box(
         modifier = modifier
             .background(bgColor, CircleShape)
@@ -158,7 +155,7 @@ private fun FavoriteButton(
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
             contentDescription = if (isFavorite) "즐겨찾기 해제" else "즐겨찾기",
-            tint = Color.White,
+            tint = iconTint,
             modifier = Modifier.size(14.dp)
         )
     }
