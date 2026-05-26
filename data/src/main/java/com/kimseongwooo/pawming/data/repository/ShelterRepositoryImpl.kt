@@ -13,7 +13,7 @@ class ShelterRepositoryImpl @Inject constructor(
 
     override suspend fun getShelters(uprCd: String?, orgCd: String?): Result<List<Shelter>> =
         runCatching {
-            remoteDataSource.getShelters(uprCd, orgCd).map { it.toDomain() }
+            remoteDataSource.getShelters(uprCd, orgCd).map { it.toDomain() }.distinctBy { it.careRegNo }
         }
 
     override suspend fun getShelterDetail(careRegNo: String): Result<ShelterDetail> =
