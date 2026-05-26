@@ -9,7 +9,7 @@ interface ShelterInfoApiService {
 
     @GET("shelterInfo_v2")
     suspend fun getShelterInfo(
-        @Query("careRegNo") careRegNo: String? = null,
+        @Query("care_reg_no") careRegNo: String? = null,
         @Query("numOfRows") numOfRows: Int = 10,
         @Query("pageNo") pageNo: Int = 1
     ): ApiResponseNetworkModel<ShelterInfoNetworkModel>
