@@ -1,32 +1,35 @@
 package com.kimseongwooo.pawming.feature.home.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.kimseongwooo.pawming.feature.home.HomeSideEffect
+import com.kimseongwooo.pawming.feature.home.HomeScreen
+import com.kimseongwooo.pawming.feature.home.HomeViewModel
 import com.kimseongwooo.pawming.feature.home.HomeRoute
 
 fun EntryProviderScope<NavKey>.homeNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit
 ) {
     entry<HomeRoute> {
-        HomeScreen(onNavigateToAnimalDetail = onNavigateToAnimalDetail)
-    }
-}
+        val viewModel = hiltViewModel<HomeViewModel>()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-@Composable
-internal fun HomeScreen(
-    onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "홈")
+        LaunchedEffect(viewModel) {
+            viewModel.sideEffect.collect { effect ->
+                when (effect) {
+                    is HomeSideEffect.NavigateToAnimalDetail ->
+                        onNavigateToAnimalDetail(effect.desertionNo)
+                }
+            }
+        }
+
+        HomeScreen(
+            uiState = state,
+            onIntent = viewModel::handleIntent
+        )
     }
 }
