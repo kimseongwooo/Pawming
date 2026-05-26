@@ -1,32 +1,35 @@
 package com.kimseongwooo.pawming.feature.favorites.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.kimseongwooo.pawming.feature.favorites.FavoritesRoute
+import com.kimseongwooo.pawming.feature.favorites.FavoritesScreen
+import com.kimseongwooo.pawming.feature.favorites.FavoritesSideEffect
+import com.kimseongwooo.pawming.feature.favorites.FavoritesViewModel
 
 fun EntryProviderScope<NavKey>.favoritesNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit
 ) {
     entry<FavoritesRoute> {
-        FavoritesScreen(onNavigateToAnimalDetail = onNavigateToAnimalDetail)
-    }
-}
+        val viewModel: FavoritesViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-@Composable
-internal fun FavoritesScreen(
-    onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "즐겨찾기")
+        LaunchedEffect(viewModel) {
+            viewModel.sideEffect.collect { effect ->
+                when (effect) {
+                    is FavoritesSideEffect.NavigateToAnimalDetail ->
+                        onNavigateToAnimalDetail(effect.desertionNo)
+                }
+            }
+        }
+
+        FavoritesScreen(
+            uiState = uiState,
+            onIntent = viewModel::handleIntent
+        )
     }
 }
