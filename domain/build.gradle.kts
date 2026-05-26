@@ -5,4 +5,5 @@ plugins {
 dependencies {
     implementation(project(":model"))
     implementation(libs.javax.inject)
+    implementation(libs.kotlinx.coroutines.core)
 }
