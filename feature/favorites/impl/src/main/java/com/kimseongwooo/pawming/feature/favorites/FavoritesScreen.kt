@@ -1,9 +1,5 @@
 package com.kimseongwooo.pawming.feature.favorites
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,22 +18,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,15 +52,8 @@ internal fun FavoritesScreen(
                     PawmingLoadingIndicator()
                 }
             }
-            uiState.favorites.isEmpty() -> {
-                FavoritesEmptyState()
-            }
-            else -> {
-                FavoritesList(
-                    favorites = uiState.favorites,
-                    onIntent = onIntent
-                )
-            }
+            uiState.favorites.isEmpty() -> FavoritesEmptyState()
+            else -> FavoritesList(favorites = uiState.favorites, onIntent = onIntent)
         }
     }
 }
@@ -125,71 +106,23 @@ private fun FavoritesList(
     favorites: List<FavoriteAnimal>,
     onIntent: (FavoritesIntent) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(1.dp)
-    ) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(items = favorites, key = { it.desertionNo }) { animal ->
-            SwipeToDismissFavoriteItem(
+            FavoriteAnimalItem(
                 animal = animal,
-                onDismiss = { onIntent(FavoritesIntent.RemoveFavorite(animal.desertionNo)) },
-                onClick = { onIntent(FavoritesIntent.ClickAnimal(animal.desertionNo)) }
+                onClick = { onIntent(FavoritesIntent.ClickAnimal(animal.desertionNo)) },
+                onRemove = { onIntent(FavoritesIntent.RemoveFavorite(animal.desertionNo)) }
             )
         }
         item { Spacer(Modifier.height(16.dp)) }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SwipeToDismissFavoriteItem(
-    animal: FavoriteAnimal,
-    onDismiss: () -> Unit,
-    onClick: () -> Unit
-) {
-    var dismissed by remember { mutableStateOf(false) }
-    val swipeState = rememberSwipeToDismissBoxState()
-
-    LaunchedEffect(swipeState.currentValue) {
-        if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            dismissed = true
-            onDismiss()
-        }
-    }
-
-    AnimatedVisibility(
-        visible = !dismissed,
-        exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
-    ) {
-        SwipeToDismissBox(
-            state = swipeState,
-            backgroundContent = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFE53935))
-                        .padding(end = 20.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "삭제",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            },
-            enableDismissFromStartToEnd = false
-        ) {
-            FavoriteAnimalItem(animal = animal, onClick = onClick)
-        }
-    }
-}
-
 @Composable
 private fun FavoriteAnimalItem(
     animal: FavoriteAnimal,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onRemove: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -207,7 +140,7 @@ private fun FavoriteAnimalItem(
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .aspectRatio(1f),
+                    .aspectRatio(1f)
             ) {
                 if (animal.imageUrl.isNotEmpty()) {
                     AsyncImage(
@@ -216,7 +149,7 @@ private fun FavoriteAnimalItem(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .then(Modifier.background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp)))
+                            .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp))
                     )
                 } else {
                     Box(
@@ -272,6 +205,15 @@ private fun FavoriteAnimalItem(
                     color = Color(0xFFAAAAAA),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "즐겨찾기 해제",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
