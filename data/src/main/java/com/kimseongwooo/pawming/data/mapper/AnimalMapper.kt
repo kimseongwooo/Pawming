@@ -1,6 +1,7 @@
 package com.kimseongwooo.pawming.data.mapper
 
 import com.kimseongwooo.pawming.model.Animal
+import kotlinx.collections.immutable.toImmutableList
 import com.kimseongwooo.pawming.model.Kind
 import com.kimseongwooo.pawming.model.Sido
 import com.kimseongwooo.pawming.model.Sigungu
@@ -28,7 +29,8 @@ fun AnimalNetworkModel.toDomain(): Animal = Animal(
     endReason = endReason.orEmpty(),
     updTm = updTm.orEmpty(),
     images = listOfNotNull(popfile1, popfile2, popfile3, popfile4, popfile5, popfile6, popfile7, popfile8)
-        .filter { it.isNotEmpty() },
+        .filter { it.isNotEmpty() }
+        .toImmutableList(),
     noticeNo = noticeNo.orEmpty(),
     noticeSdt = noticeSdt.orEmpty(),
     noticeEdt = noticeEdt.orEmpty(),

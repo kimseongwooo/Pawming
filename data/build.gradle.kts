@@ -20,6 +20,7 @@ android {
 
 dependencies {
     implementation(project(":model"))
+    implementation(libs.kotlinx.collections.immutable)
     implementation(project(":domain"))
     implementation(project(":network"))
     implementation(libs.hilt.android)
