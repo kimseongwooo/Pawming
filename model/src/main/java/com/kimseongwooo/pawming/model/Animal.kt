@@ -1,5 +1,7 @@
 package com.kimseongwooo.pawming.model
 
+import kotlinx.collections.immutable.ImmutableList
+
 data class Animal(
     // 기본 정보
     val desertionNo: String,
@@ -21,7 +23,7 @@ data class Animal(
     val updTm: String,
 
     // 이미지 (popfile1~8 통합)
-    val images: List<String>,
+    val images: ImmutableList<String>,
 
     // 공고 정보
     val noticeNo: String,
