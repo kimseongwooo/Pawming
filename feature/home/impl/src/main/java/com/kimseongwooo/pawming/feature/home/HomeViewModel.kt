@@ -2,16 +2,24 @@ package com.kimseongwooo.pawming.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kimseongwooo.pawming.domain.usecase.AddFavoriteUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetAbandonmentPublicUseCase
+import com.kimseongwooo.pawming.domain.usecase.GetFavoriteIdsUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetShelterDetailUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetSheltersUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetSidoUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetSigunguUseCase
+import com.kimseongwooo.pawming.domain.usecase.RemoveFavoriteUseCase
+import com.kimseongwooo.pawming.model.Animal
+import com.kimseongwooo.pawming.model.FavoriteAnimal
 import com.kimseongwooo.pawming.model.Sido
 import com.kimseongwooo.pawming.model.Sigungu
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +56,7 @@ sealed interface HomeIntent {
     data object ShelterPickerBack : HomeIntent
     data class ViewShelterDetail(val careRegNo: String) : HomeIntent
     data object DismissShelterDetail : HomeIntent
+    data class ToggleFavorite(val animal: Animal) : HomeIntent
 }
 
 // ── SideEffect ─────────────────────────────────────────────────────────────
@@ -64,7 +73,10 @@ class HomeViewModel @Inject constructor(
     private val getSheltersUseCase: GetSheltersUseCase,
     private val getShelterDetailUseCase: GetShelterDetailUseCase,
     private val getSidoUseCase: GetSidoUseCase,
-    private val getSigunguUseCase: GetSigunguUseCase
+    private val getSigunguUseCase: GetSigunguUseCase,
+    private val getFavoriteIdsUseCase: GetFavoriteIdsUseCase,
+    private val addFavoriteUseCase: AddFavoriteUseCase,
+    private val removeFavoriteUseCase: RemoveFavoriteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -77,6 +89,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadInitial()
+        collectFavoriteIds()
     }
 
     fun handleIntent(intent: HomeIntent) {
@@ -210,6 +223,8 @@ class HomeViewModel @Inject constructor(
             HomeIntent.DismissShelterDetail -> _uiState.update {
                 it.copy(shelterDetail = null, isLoadingShelterDetail = false)
             }
+
+            is HomeIntent.ToggleFavorite -> toggleFavorite(intent.animal)
         }
     }
 
@@ -355,6 +370,34 @@ class HomeViewModel @Inject constructor(
                 },
                 onFailure = { _uiState.update { it.copy(isLoadingPickerItems = false) } }
             )
+        }
+    }
+
+    private fun collectFavoriteIds() {
+        getFavoriteIdsUseCase()
+            .onEach { ids -> _uiState.update { it.copy(favoriteIds = ids.toImmutableSet()) } }
+            .launchIn(viewModelScope)
+    }
+
+    private fun toggleFavorite(animal: Animal) {
+        viewModelScope.launch {
+            val isFavorite = _uiState.value.favoriteIds.contains(animal.desertionNo)
+            if (isFavorite) {
+                removeFavoriteUseCase(animal.desertionNo)
+            } else {
+                addFavoriteUseCase(
+                    FavoriteAnimal(
+                        desertionNo = animal.desertionNo,
+                        kindNm = animal.kindNm,
+                        sexCd = animal.sexCd,
+                        age = animal.age,
+                        happenPlace = animal.happenPlace,
+                        processState = animal.processState,
+                        imageUrl = animal.images.firstOrNull() ?: "",
+                        savedAt = System.currentTimeMillis()
+                    )
+                )
+            }
         }
     }
 

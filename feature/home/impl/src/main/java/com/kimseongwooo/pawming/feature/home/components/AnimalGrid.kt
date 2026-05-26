@@ -49,9 +49,9 @@ internal fun AnimalGrid(
                 sexCd = animal.sexCd,
                 age = animal.age,
                 happenPlace = animal.happenPlace,
-                isFavorite = false,
+                isFavorite = uiState.favoriteIds.contains(animal.desertionNo),
                 onClick = { onIntent(HomeIntent.ClickAnimal(animal.desertionNo)) },
-                onFavoriteClick = {}
+                onFavoriteClick = { onIntent(HomeIntent.ToggleFavorite(animal)) }
             ) {
                 AnimalThumbnail(imageUrl = animal.images.firstOrNull())
             }

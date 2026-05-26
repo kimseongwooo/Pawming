@@ -7,7 +7,9 @@ import com.kimseongwooo.pawming.model.ShelterDetail
 import com.kimseongwooo.pawming.model.Sido
 import com.kimseongwooo.pawming.model.Sigungu
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 
 enum class ShelterPickerStep { SIDO, SIGUNGU, SHELTER }
@@ -36,7 +38,8 @@ data class HomeUiState(
     val shelterPickerQuery: String = "",
     val isLoadingPickerItems: Boolean = false,
     val shelterDetail: ShelterDetail? = null,
-    val isLoadingShelterDetail: Boolean = false
+    val isLoadingShelterDetail: Boolean = false,
+    val favoriteIds: ImmutableSet<String> = persistentSetOf()
 ) {
     val activeFilterCount: Int
         get() = listOf(filterUpkind, filterNeuter, filterState, filterCareRegNo).count { it.isNotEmpty() }
