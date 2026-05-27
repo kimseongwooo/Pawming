@@ -1,5 +1,6 @@
 package com.kimseongwooo.pawming.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,12 @@ fun PawmingNavGraph() {
         TopLevelTab.Home -> homeBackStack
         TopLevelTab.Favorites -> favoritesBackStack
         TopLevelTab.Shelter -> shelterBackStack
+    }
+
+    // NavDisplay 내부 BackHandler보다 낮은 우선순위. NavDisplay가 루트에서 back을
+    // 비활성화할 때(previousEntries가 빈 경우)만 동작하여 Home 탭으로 전환.
+    BackHandler(enabled = selectedTab != TopLevelTab.Home) {
+        selectedTab = TopLevelTab.Home
     }
 
     NavDisplay(

@@ -1,33 +1,36 @@
 package com.kimseongwooo.pawming.feature.shelter.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.kimseongwooo.pawming.feature.shelter.ShelterRoute
+import com.kimseongwooo.pawming.feature.shelter.ShelterScreen
+import com.kimseongwooo.pawming.feature.shelter.ShelterSideEffect
+import com.kimseongwooo.pawming.feature.shelter.ShelterViewModel
 
 fun EntryProviderScope<NavKey>.shelterNavEntries(
     onNavigateToShelterDetail: (careRegNo: String) -> Unit,
     metadata: Map<String, Any> = emptyMap()
 ) {
     entry<ShelterRoute>(metadata = metadata) {
-        ShelterScreen(onNavigateToShelterDetail = onNavigateToShelterDetail)
-    }
-}
+        val viewModel: ShelterViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-@Composable
-internal fun ShelterScreen(
-    onNavigateToShelterDetail: (careRegNo: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "보호센터")
+        LaunchedEffect(viewModel) {
+            viewModel.sideEffect.collect { effect ->
+                when (effect) {
+                    is ShelterSideEffect.NavigateToShelterDetail ->
+                        onNavigateToShelterDetail(effect.careRegNo)
+                }
+            }
+        }
+
+        ShelterScreen(
+            uiState = uiState,
+            onIntent = viewModel::handleIntent
+        )
     }
 }
