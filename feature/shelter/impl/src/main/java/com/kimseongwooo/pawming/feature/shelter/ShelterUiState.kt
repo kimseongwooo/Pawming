@@ -15,7 +15,7 @@ data class ShelterUiState(
     val selectedSigungu: Sigungu? = null,
     val shelters: ImmutableList<Shelter> = persistentListOf(),
     val searchQuery: String = "",
-    val isSidoLoading: Boolean = false,
+    val isInitialLoading: Boolean = true,
     val isShelterLoading: Boolean = false,
     val error: String? = null
 )

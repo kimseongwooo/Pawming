@@ -52,6 +52,7 @@ internal fun ShelterHeader(
     selectedSido: Sido?,
     selectedSigungu: Sigungu?,
     searchQuery: String,
+    isInitialLoading: Boolean,
     onSelectSido: (Sido) -> Unit,
     onSelectSigungu: (Sigungu) -> Unit,
     onSearchQueryChange: (String) -> Unit,
@@ -63,7 +64,6 @@ internal fun ShelterHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
             .statusBarsPadding()
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -84,6 +84,7 @@ internal fun ShelterHeader(
                 options = sidoList,
                 optionLabel = { it.orgdownNm },
                 onSelect = onSelectSido,
+                enabled = !isInitialLoading,
                 modifier = Modifier.weight(1f)
             )
             if (showSigunguDropdown) {
@@ -93,7 +94,7 @@ internal fun ShelterHeader(
                     options = sigunguList,
                     optionLabel = { it.orgdownNm },
                     onSelect = onSelectSigungu,
-                    enabled = sigunguList.isNotEmpty(),
+                    enabled = !isInitialLoading && sigunguList.isNotEmpty(),
                     modifier = Modifier.weight(1f)
                 )
             } else {
