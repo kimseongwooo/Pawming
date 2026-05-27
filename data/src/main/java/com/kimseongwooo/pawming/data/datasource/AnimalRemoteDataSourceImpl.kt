@@ -21,11 +21,12 @@ class AnimalRemoteDataSourceImpl @Inject constructor(
         careRegNo: String?,
         state: String?,
         neuterYn: String?,
+        desertionNo: String?,
         pageNo: Int,
         numOfRows: Int
     ): List<AnimalNetworkModel> =
         animalApiService.getAbandonmentPublic(
-            bgnde, endde, upkind, kind, uprCd, orgCd, careRegNo, state, neuterYn, pageNo, numOfRows
+            bgnde, endde, upkind, kind, uprCd, orgCd, careRegNo, state, neuterYn, desertionNo, pageNo, numOfRows
         ).response.body?.items?.item ?: emptyList()
 
     override suspend fun getSido(): List<SidoNetworkModel> =

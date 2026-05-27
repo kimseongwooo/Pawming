@@ -22,6 +22,7 @@ interface AnimalApiService {
         @Query("care_reg_no") careRegNo: String? = null,
         @Query("state") state: String? = null,
         @Query("neuter_yn") neuterYn: String? = null,
+        @Query("desertion_no") desertionNo: String? = null,
         @Query("pageNo") pageNo: Int = 1,
         @Query("numOfRows") numOfRows: Int = 20
     ): ApiResponseNetworkModel<AnimalNetworkModel>

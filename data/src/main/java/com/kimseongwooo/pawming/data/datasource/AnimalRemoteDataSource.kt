@@ -16,6 +16,7 @@ interface AnimalRemoteDataSource {
         careRegNo: String?,
         state: String?,
         neuterYn: String?,
+        desertionNo: String? = null,
         pageNo: Int,
         numOfRows: Int
     ): List<AnimalNetworkModel>

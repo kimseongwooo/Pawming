@@ -27,7 +27,9 @@ class AnimalRepositoryImpl @Inject constructor(
         numOfRows: Int
     ): Result<List<Animal>> = runCatching {
         remoteDataSource.getAbandonmentPublic(
-            bgnde, endde, upkind, kind, uprCd, orgCd, careRegNo, state, neuterYn, pageNo, numOfRows
+            bgnde = bgnde, endde = endde, upkind = upkind, kind = kind,
+            uprCd = uprCd, orgCd = orgCd, careRegNo = careRegNo, state = state,
+            neuterYn = neuterYn, desertionNo = null, pageNo = pageNo, numOfRows = numOfRows
         ).map { it.toDomain() }
     }
 
@@ -37,6 +39,14 @@ class AnimalRepositoryImpl @Inject constructor(
 
     override suspend fun getSigungu(uprCd: String): Result<List<Sigungu>> = runCatching {
         remoteDataSource.getSigungu(uprCd).map { it.toDomain() }
+    }
+
+    override suspend fun getAnimalByDesertionNo(desertionNo: String): Result<Animal?> = runCatching {
+        remoteDataSource.getAbandonmentPublic(
+            bgnde = null, endde = null, upkind = null, kind = null,
+            uprCd = null, orgCd = null, careRegNo = null, state = null, neuterYn = null,
+            desertionNo = desertionNo, pageNo = 1, numOfRows = 1
+        ).firstOrNull()?.toDomain()
     }
 
     override suspend fun getKind(upKindCd: String?): Result<List<Kind>> = runCatching {

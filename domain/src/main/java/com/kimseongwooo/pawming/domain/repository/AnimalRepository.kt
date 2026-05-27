@@ -20,6 +20,8 @@ interface AnimalRepository {
         numOfRows: Int = 20
     ): Result<List<Animal>>
 
+    suspend fun getAnimalByDesertionNo(desertionNo: String): Result<Animal?>
+
     suspend fun getSido(): Result<List<Sido>>
 
     suspend fun getSigungu(uprCd: String): Result<List<Sigungu>>
