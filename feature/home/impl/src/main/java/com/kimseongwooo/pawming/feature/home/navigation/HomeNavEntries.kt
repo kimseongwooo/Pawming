@@ -10,9 +10,13 @@ import com.kimseongwooo.pawming.feature.home.HomeSideEffect
 import com.kimseongwooo.pawming.feature.home.HomeScreen
 import com.kimseongwooo.pawming.feature.home.HomeViewModel
 import com.kimseongwooo.pawming.feature.home.HomeRoute
+import com.kimseongwooo.pawming.feature.home.HomeIntent
 
 fun EntryProviderScope<NavKey>.homeNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
+    pendingShelterId: String = "",
+    pendingShelterNm: String = "",
+    onShelterFilterApplied: () -> Unit = {},
     metadata: Map<String, Any> = emptyMap()
 ) {
     entry<HomeRoute>(metadata = metadata) {
@@ -25,6 +29,18 @@ fun EntryProviderScope<NavKey>.homeNavEntries(
                     is HomeSideEffect.NavigateToAnimalDetail ->
                         onNavigateToAnimalDetail(effect.desertionNo)
                 }
+            }
+        }
+
+        LaunchedEffect(pendingShelterId) {
+            if (pendingShelterId.isNotEmpty()) {
+                viewModel.handleIntent(
+                    HomeIntent.ApplyExternalShelterFilter(
+                        careRegNo = pendingShelterId,
+                        careNm = pendingShelterNm
+                    )
+                )
+                onShelterFilterApplied()
             }
         }
 

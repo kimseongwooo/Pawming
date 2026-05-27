@@ -57,6 +57,7 @@ sealed interface HomeIntent {
     data class ViewShelterDetail(val careRegNo: String) : HomeIntent
     data object DismissShelterDetail : HomeIntent
     data class ToggleFavorite(val animal: Animal) : HomeIntent
+    data class ApplyExternalShelterFilter(val careRegNo: String, val careNm: String) : HomeIntent
 }
 
 // ── SideEffect ─────────────────────────────────────────────────────────────
@@ -225,6 +226,14 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeIntent.ToggleFavorite -> toggleFavorite(intent.animal)
+            is HomeIntent.ApplyExternalShelterFilter -> applyFilter { s ->
+                s.copy(
+                    filterCareRegNo = intent.careRegNo,
+                    filterCareNm = intent.careNm,
+                    isFilterOpen = true,
+                    isShowShelterPicker = false
+                )
+            }
         }
     }
 

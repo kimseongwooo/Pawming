@@ -30,6 +30,8 @@ import com.kimseongwooo.pawming.feature.shelterdetail.navigation.shelterDetailNa
 @Composable
 fun PawmingNavGraph() {
     var selectedTab by rememberSaveable { mutableStateOf(TopLevelTab.Home) }
+    var pendingShelterId by rememberSaveable { mutableStateOf("") }
+    var pendingShelterNm by rememberSaveable { mutableStateOf("") }
 
     // 탭별 독립 backstack — @Serializable NavKey 덕분에 프로세스 재시작 후에도 복원됨
     val homeBackStack = rememberNavBackStack(HomeRoute)
@@ -74,6 +76,12 @@ fun PawmingNavGraph() {
         entryProvider = entryProvider {
             homeNavEntries(
                 onNavigateToAnimalDetail = { homeBackStack.add(AnimalDetailRoute(it)) },
+                pendingShelterId = pendingShelterId,
+                pendingShelterNm = pendingShelterNm,
+                onShelterFilterApplied = {
+                    pendingShelterId = ""
+                    pendingShelterNm = ""
+                },
                 metadata = topLevelMetadata()
             )
             favoritesNavEntries(
@@ -88,7 +96,13 @@ fun PawmingNavGraph() {
                 onBack = { activeBackStack.removeLastOrNull() }
             )
             shelterDetailNavEntries(
-                onBack = { activeBackStack.removeLastOrNull() }
+                onBack = { activeBackStack.removeLastOrNull() },
+                onViewAnimalsWithShelterFilter = { careRegNo, careNm ->
+                    pendingShelterId = careRegNo
+                    pendingShelterNm = careNm
+                    while (shelterBackStack.size > 1) shelterBackStack.removeLastOrNull()
+                    selectedTab = TopLevelTab.Home
+                }
             )
         }
     )
