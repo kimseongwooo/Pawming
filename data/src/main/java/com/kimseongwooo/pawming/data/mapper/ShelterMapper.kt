@@ -7,7 +7,32 @@ import com.kimseongwooo.pawming.network.model.ShelterNetworkModel
 
 fun ShelterNetworkModel.toDomain(): Shelter = Shelter(
     careRegNo = careRegNo,
-    careNm = careNm
+    careNm = careNm,
+    orgNm = orgNm.orEmpty(),
+    divisionNm = divisionNm.orEmpty(),
+    saveTrgtAnimal = saveTrgtAnimal.orEmpty(),
+    careAddr = careAddr.orEmpty(),
+    careTel = careTel.orEmpty(),
+    weekOprStime = weekOprStime.orEmpty(),
+    weekOprEtime = weekOprEtime.orEmpty(),
+    weekendOprStime = weekendOprStime.orEmpty(),
+    weekendOprEtime = weekendOprEtime.orEmpty(),
+    closeDay = closeDay.orEmpty()
+)
+
+fun ShelterInfoNetworkModel.toShelter(): Shelter = Shelter(
+    careRegNo = careRegNo.orEmpty(),
+    careNm = careNm.orEmpty(),
+    orgNm = orgNm.orEmpty(),
+    divisionNm = divisionNm.orEmpty(),
+    saveTrgtAnimal = saveTrgtAnimal.orEmpty(),
+    careAddr = careAddr.orEmpty(),
+    careTel = careTel.orEmpty(),
+    weekOprStime = weekOprStime.orEmpty(),
+    weekOprEtime = weekOprEtime.orEmpty(),
+    weekendOprStime = weekendOprStime.orEmpty(),
+    weekendOprEtime = weekendOprEtime.orEmpty(),
+    closeDay = closeDay.orEmpty()
 )
 
 fun ShelterInfoNetworkModel.toDomain(): ShelterDetail = ShelterDetail(
