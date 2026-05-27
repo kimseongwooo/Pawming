@@ -11,9 +11,10 @@ import androidx.navigation3.runtime.NavKey
 import com.kimseongwooo.pawming.feature.shelter.ShelterRoute
 
 fun EntryProviderScope<NavKey>.shelterNavEntries(
-    onNavigateToShelterDetail: (careRegNo: String) -> Unit
+    onNavigateToShelterDetail: (careRegNo: String) -> Unit,
+    metadata: Map<String, Any> = emptyMap()
 ) {
-    entry<ShelterRoute> {
+    entry<ShelterRoute>(metadata = metadata) {
         ShelterScreen(onNavigateToShelterDetail = onNavigateToShelterDetail)
     }
 }

@@ -1,15 +1,14 @@
 package com.kimseongwooo.pawming.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.kimseongwooo.pawming.designsystem.component.PawmingBottomNav
 import com.kimseongwooo.pawming.designsystem.component.PawmingBottomNavItem
@@ -42,43 +41,50 @@ fun PawmingNavGraph() {
         TopLevelTab.Shelter -> shelterBackStack
     }
 
-    Scaffold(
-        bottomBar = {
-            PawmingBottomNav {
-                TopLevelTab.entries.forEach { tab ->
-                    PawmingBottomNavItem(
-                        selected = selectedTab == tab,
-                        onClick = { selectedTab = tab },
-                        label = tab.label,
-                        icon = { active -> tab.Icon(active) }
-                    )
+    NavDisplay(
+        backStack = activeBackStack,
+        onBack = { activeBackStack.removeLastOrNull() },
+        sceneStrategies = listOf(
+            PawmingSceneStrategy(
+                bottomBar = {
+                    PawmingBottomNav {
+                        TopLevelTab.entries.forEach { tab ->
+                            PawmingBottomNavItem(
+                                selected = selectedTab == tab,
+                                onClick = { selectedTab = tab },
+                                label = tab.label,
+                                icon = { active -> tab.Icon(active) }
+                            )
+                        }
+                    }
                 }
-            }
+            )
+        ),
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            homeNavEntries(
+                onNavigateToAnimalDetail = { homeBackStack.add(AnimalDetailRoute(it)) },
+                metadata = topLevelMetadata()
+            )
+            favoritesNavEntries(
+                onNavigateToAnimalDetail = { favoritesBackStack.add(AnimalDetailRoute(it)) },
+                metadata = topLevelMetadata()
+            )
+            shelterNavEntries(
+                onNavigateToShelterDetail = { shelterBackStack.add(ShelterDetailRoute(it)) },
+                metadata = topLevelMetadata()
+            )
+            animalDetailNavEntries(
+                onBack = { activeBackStack.removeLastOrNull() }
+            )
+            shelterDetailNavEntries(
+                onBack = { activeBackStack.removeLastOrNull() }
+            )
         }
-    ) { innerPadding ->
-        NavDisplay(
-            backStack = activeBackStack,
-            modifier = Modifier.padding(innerPadding),
-            onBack = { activeBackStack.removeLastOrNull() },
-            entryProvider = entryProvider {
-                homeNavEntries(
-                    onNavigateToAnimalDetail = { homeBackStack.add(AnimalDetailRoute(it)) }
-                )
-                favoritesNavEntries(
-                    onNavigateToAnimalDetail = { favoritesBackStack.add(AnimalDetailRoute(it)) }
-                )
-                shelterNavEntries(
-                    onNavigateToShelterDetail = { shelterBackStack.add(ShelterDetailRoute(it)) }
-                )
-                animalDetailNavEntries(
-                    onBack = { activeBackStack.removeLastOrNull() }
-                )
-                shelterDetailNavEntries(
-                    onBack = { activeBackStack.removeLastOrNull() }
-                )
-            }
-        )
-    }
+    )
 }
 
 private enum class TopLevelTab(val label: String) {

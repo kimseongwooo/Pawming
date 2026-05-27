@@ -12,9 +12,10 @@ import com.kimseongwooo.pawming.feature.favorites.FavoritesSideEffect
 import com.kimseongwooo.pawming.feature.favorites.FavoritesViewModel
 
 fun EntryProviderScope<NavKey>.favoritesNavEntries(
-    onNavigateToAnimalDetail: (desertionNo: String) -> Unit
+    onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
+    metadata: Map<String, Any> = emptyMap()
 ) {
-    entry<FavoritesRoute> {
+    entry<FavoritesRoute>(metadata = metadata) {
         val viewModel: FavoritesViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

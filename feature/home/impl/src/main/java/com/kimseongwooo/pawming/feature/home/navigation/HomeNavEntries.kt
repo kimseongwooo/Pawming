@@ -12,9 +12,10 @@ import com.kimseongwooo.pawming.feature.home.HomeViewModel
 import com.kimseongwooo.pawming.feature.home.HomeRoute
 
 fun EntryProviderScope<NavKey>.homeNavEntries(
-    onNavigateToAnimalDetail: (desertionNo: String) -> Unit
+    onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
+    metadata: Map<String, Any> = emptyMap()
 ) {
-    entry<HomeRoute> {
+    entry<HomeRoute>(metadata = metadata) {
         val viewModel = hiltViewModel<HomeViewModel>()
         val state by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":feature:shelter:impl"))
     implementation(project(":feature:animal-detail:impl"))
     implementation(project(":feature:shelter-detail:impl"))
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
