@@ -7,8 +7,10 @@ import com.kimseongwooo.pawming.domain.usecase.GetAnimalByDesertionNoUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetFavoriteIdsUseCase
 import com.kimseongwooo.pawming.domain.usecase.RemoveFavoriteUseCase
 import com.kimseongwooo.pawming.model.FavoriteAnimal
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,15 +21,20 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AnimalDetailViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AnimalDetailViewModel.Factory::class)
+class AnimalDetailViewModel @AssistedInject constructor(
+    @Assisted private val desertionNo: String,
     private val getAnimalByDesertionNoUseCase: GetAnimalByDesertionNoUseCase,
     private val getFavoriteIdsUseCase: GetFavoriteIdsUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(desertionNo: String): AnimalDetailViewModel
+    }
 
     private val _uiState = MutableStateFlow(AnimalDetailUiState())
     val uiState: StateFlow<AnimalDetailUiState> = _uiState.asStateFlow()
@@ -35,19 +42,21 @@ class AnimalDetailViewModel @Inject constructor(
     private val _sideEffect = Channel<AnimalDetailSideEffect>(Channel.BUFFERED)
     val sideEffect: Flow<AnimalDetailSideEffect> = _sideEffect.receiveAsFlow()
 
-    private var currentDesertionNo: String = ""
-    private var loadJob: Job? = null
-
     init {
+        loadAnimal()
         collectFavoriteIds()
     }
 
-    fun load(desertionNo: String) {
-        if (currentDesertionNo == desertionNo) return
-        currentDesertionNo = desertionNo
-        _uiState.update { AnimalDetailUiState(isLoading = true) }
-        loadJob?.cancel()
-        loadJob = viewModelScope.launch {
+    fun handleIntent(intent: AnimalDetailIntent) {
+        when (intent) {
+            AnimalDetailIntent.ToggleFavorite -> toggleFavorite()
+            AnimalDetailIntent.Retry -> loadAnimal()
+        }
+    }
+
+    private fun loadAnimal() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
             getAnimalByDesertionNoUseCase(desertionNo).fold(
                 onSuccess = { animal ->
                     _uiState.update { it.copy(isLoading = false, animal = animal) }
@@ -59,22 +68,9 @@ class AnimalDetailViewModel @Inject constructor(
         }
     }
 
-    fun handleIntent(intent: AnimalDetailIntent) {
-        when (intent) {
-            AnimalDetailIntent.ToggleFavorite -> toggleFavorite()
-            AnimalDetailIntent.Retry -> {
-                val desertionNo = currentDesertionNo
-                if (desertionNo.isNotEmpty()) {
-                    currentDesertionNo = ""
-                    load(desertionNo)
-                }
-            }
-        }
-    }
-
     private fun collectFavoriteIds() {
         getFavoriteIdsUseCase()
-            .onEach { ids -> _uiState.update { it.copy(isFavorite = ids.contains(currentDesertionNo)) } }
+            .onEach { ids -> _uiState.update { it.copy(isFavorite = ids.contains(desertionNo)) } }
             .launchIn(viewModelScope)
     }
 
@@ -83,7 +79,7 @@ class AnimalDetailViewModel @Inject constructor(
         val animal = state.animal ?: return
         viewModelScope.launch {
             if (state.isFavorite) {
-                removeFavoriteUseCase(currentDesertionNo)
+                removeFavoriteUseCase(desertionNo)
             } else {
                 addFavoriteUseCase(
                     FavoriteAnimal(
