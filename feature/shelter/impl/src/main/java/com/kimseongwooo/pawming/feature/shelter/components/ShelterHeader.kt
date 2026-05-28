@@ -74,31 +74,32 @@ internal fun ShelterHeader(
             color = PawmingColors.Neutral900
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            RegionDropdown(
-                placeholder = "시/도",
-                selectedLabel = selectedSido?.orgdownNm,
-                options = sidoList,
-                optionLabel = { it.orgdownNm },
-                onSelect = onSelectSido,
-                enabled = !isInitialLoading,
-                modifier = Modifier.weight(1f)
-            )
-            if (showSigunguDropdown) {
+        if (!isInitialLoading) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 RegionDropdown(
-                    placeholder = "시/군/구",
-                    selectedLabel = selectedSigungu?.orgdownNm,
-                    options = sigunguList,
+                    placeholder = "시/도",
+                    selectedLabel = selectedSido?.orgdownNm,
+                    options = sidoList,
                     optionLabel = { it.orgdownNm },
-                    onSelect = onSelectSigungu,
-                    enabled = !isInitialLoading && sigunguList.isNotEmpty(),
+                    onSelect = onSelectSido,
                     modifier = Modifier.weight(1f)
                 )
-            } else {
-                Spacer(modifier = Modifier.weight(1f))
+                if (showSigunguDropdown) {
+                    RegionDropdown(
+                        placeholder = "시/군/구",
+                        selectedLabel = selectedSigungu?.orgdownNm,
+                        options = sigunguList,
+                        optionLabel = { it.orgdownNm },
+                        onSelect = onSelectSigungu,
+                        enabled = sigunguList.isNotEmpty(),
+                        modifier = Modifier.weight(1f)
+                    )
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
 
