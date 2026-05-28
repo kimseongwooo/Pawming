@@ -8,7 +8,10 @@ data class AnimalDetailUiState(
     val animal: Animal? = null,
     val isLoading: Boolean = true,
     val error: String? = null,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val shelterLat: Double? = null,
+    val shelterLng: Double? = null,
+    val isShelterLoading: Boolean = false
 )
 
 sealed interface AnimalDetailIntent {

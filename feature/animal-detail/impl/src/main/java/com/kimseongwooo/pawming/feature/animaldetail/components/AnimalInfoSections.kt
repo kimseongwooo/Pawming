@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -190,36 +193,70 @@ internal fun AdoptionSection(animal: Animal) {
 }
 
 @Composable
-internal fun ShelterSection(animal: Animal) {
+internal fun ShelterSection(
+    animal: Animal,
+    shelterLat: Double?,
+    shelterLng: Double?,
+    isShelterLoading: Boolean = false
+) {
     val context = LocalContext.current
     DetailSection(title = "🏥 보호소 정보") {
         InfoRow(label = "보호소명", value = animal.careNm)
         InfoRow(label = "관할기관", value = animal.orgNm)
         InfoRow(label = "주소", value = animal.careAddr)
-        InfoRow(label = "대표자", value = animal.careOwnerNm, showDivider = false)
+        InfoRow(label = "대표자", value = animal.careOwnerNm, showDivider = animal.careTel.isNotEmpty())
         if (animal.careTel.isNotEmpty()) {
-            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
-                    .clickable {
-                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${animal.careTel}"))
-                        context.startActivity(intent)
-                    }
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.Center,
+                    .padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "📞", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
                 Text(
-                    text = animal.careTel,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "전화",
+                    fontSize = 13.sp,
+                    color = Color(0xFF999999),
+                    modifier = Modifier.weight(1f)
                 )
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable {
+                            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${animal.careTel}"))
+                            context.startActivity(intent)
+                        }
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = animal.careTel,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF1A1A1A)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(15.dp)
+                    )
+                }
+            }
+        }
+        val mapModifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .clip(RoundedCornerShape(8.dp))
+        when {
+            shelterLat != null && shelterLng != null -> {
+                Spacer(Modifier.height(12.dp))
+                ShelterLocationMap(lat = shelterLat, lng = shelterLng, modifier = mapModifier)
+            }
+            isShelterLoading -> {
+                Spacer(Modifier.height(12.dp))
+                Box(modifier = mapModifier.background(Color(0xFFEEEEEE)))
             }
         }
     }

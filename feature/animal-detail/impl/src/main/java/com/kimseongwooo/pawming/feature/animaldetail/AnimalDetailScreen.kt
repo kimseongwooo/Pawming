@@ -53,6 +53,9 @@ internal fun AnimalDetailScreen(
                 AnimalDetailContent(
                     animal = uiState.animal,
                     isFavorite = uiState.isFavorite,
+                    shelterLat = uiState.shelterLat,
+                    shelterLng = uiState.shelterLng,
+                    isShelterLoading = uiState.isShelterLoading,
                     onToggleFavorite = { onIntent(AnimalDetailIntent.ToggleFavorite) },
                     onBack = onBack
                 )
@@ -65,6 +68,9 @@ internal fun AnimalDetailScreen(
 private fun AnimalDetailContent(
     animal: Animal,
     isFavorite: Boolean,
+    shelterLat: Double?,
+    shelterLng: Double?,
+    isShelterLoading: Boolean,
     onToggleFavorite: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -93,7 +99,7 @@ private fun AnimalDetailContent(
                 item { AdoptionSection(animal) }
             }
             item { Spacer(Modifier.height(8.dp)) }
-            item { ShelterSection(animal) }
+            item { ShelterSection(animal = animal, shelterLat = shelterLat, shelterLng = shelterLng, isShelterLoading = isShelterLoading) }
         }
 
         FavoriteBottomBar(

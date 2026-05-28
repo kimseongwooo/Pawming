@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kimseongwooo.pawming.domain.usecase.AddFavoriteUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetAnimalByDesertionNoUseCase
 import com.kimseongwooo.pawming.domain.usecase.GetFavoriteIdsUseCase
+import com.kimseongwooo.pawming.domain.usecase.GetShelterDetailUseCase
 import com.kimseongwooo.pawming.domain.usecase.RemoveFavoriteUseCase
 import com.kimseongwooo.pawming.model.FavoriteAnimal
 import dagger.assisted.Assisted
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 class AnimalDetailViewModel @AssistedInject constructor(
     @Assisted private val desertionNo: String,
     private val getAnimalByDesertionNoUseCase: GetAnimalByDesertionNoUseCase,
+    private val getShelterDetailUseCase: GetShelterDetailUseCase,
     private val getFavoriteIdsUseCase: GetFavoriteIdsUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase
@@ -56,13 +58,40 @@ class AnimalDetailViewModel @AssistedInject constructor(
 
     private fun loadAnimal() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null,
+                    shelterLat = null,
+                    shelterLng = null
+                )
+            }
             getAnimalByDesertionNoUseCase(desertionNo).fold(
                 onSuccess = { animal ->
                     _uiState.update { it.copy(isLoading = false, animal = animal) }
+                    if (animal != null) loadShelterCoordinates(animal.careRegNo)
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "오류가 발생했습니다") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "오류가 발생했습니다"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun loadShelterCoordinates(careRegNo: String) {
+        _uiState.update { it.copy(isShelterLoading = true) }
+        viewModelScope.launch {
+            getShelterDetailUseCase(careRegNo).fold(
+                onSuccess = { detail ->
+                    _uiState.update { it.copy(isShelterLoading = false, shelterLat = detail.lat, shelterLng = detail.lng) }
+                },
+                onFailure = {
+                    _uiState.update { it.copy(isShelterLoading = false) }
                 }
             )
         }
