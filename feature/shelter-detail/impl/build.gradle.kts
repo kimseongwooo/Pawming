@@ -27,6 +27,7 @@ dependencies {
     api(project(":feature:shelter-detail:api"))
     implementation(project(":design-system"))
     implementation(project(":domain"))
+    implementation(libs.map.sdk)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

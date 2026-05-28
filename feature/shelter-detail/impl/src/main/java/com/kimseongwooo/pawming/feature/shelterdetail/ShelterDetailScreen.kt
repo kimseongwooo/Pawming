@@ -13,11 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +31,7 @@ import com.kimseongwooo.pawming.feature.shelterdetail.components.InfoRow
 import com.kimseongwooo.pawming.feature.shelterdetail.components.OperatingHoursTable
 import com.kimseongwooo.pawming.feature.shelterdetail.components.PhoneButton
 import com.kimseongwooo.pawming.feature.shelterdetail.components.ShelterDetailHeader
+import com.kimseongwooo.pawming.feature.shelterdetail.components.ShelterLocationMap
 import com.kimseongwooo.pawming.model.ShelterDetail
 
 private val PageBackground = Color(0xFFF7F7F7)
@@ -107,6 +108,19 @@ private fun ShelterDetailContent(
                 DetailSection(title = "📍 위치") {
                     InfoRow(label = "도로명", value = shelter.careAddr)
                     InfoRow(label = "지번", value = shelter.jibunAddr, showDivider = false)
+                    val lat = shelter.lat
+                    val lng = shelter.lng
+                    if (lat != null && lng != null) {
+                        Spacer(Modifier.height(12.dp))
+                        ShelterLocationMap(
+                            lat = lat,
+                            lng = lng,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
                 }
             }
             item { Spacer(Modifier.height(8.dp)) }
