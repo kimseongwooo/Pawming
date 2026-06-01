@@ -33,12 +33,8 @@ internal class PawmingSceneStrategy(
             override val entries: List<NavEntry<NavKey>> = listOf(lastEntry)
             override val previousEntries: List<NavEntry<NavKey>> = prevEntries
             override val content: @Composable () -> Unit = {
-                if (isTopLevel) {
-                    Scaffold(bottomBar = { capturedBottomBar() }) { innerPadding ->
-                        Box(Modifier.padding(innerPadding)) { lastEntry.Content() }
-                    }
-                } else {
-                    lastEntry.Content()
+                Scaffold(bottomBar = { if (isTopLevel) capturedBottomBar() }) { innerPadding ->
+                    Box(Modifier.padding(innerPadding)) { lastEntry.Content() }
                 }
             }
         }
