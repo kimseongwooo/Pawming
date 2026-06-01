@@ -1,5 +1,7 @@
 package com.kimseongwooo.pawming.data.mapper
 
+import com.kimseongwooo.pawming.data.db.SidoEntity
+import com.kimseongwooo.pawming.data.db.SigunguEntity
 import com.kimseongwooo.pawming.model.Animal
 import kotlinx.collections.immutable.toImmutableList
 import com.kimseongwooo.pawming.model.Kind
@@ -72,16 +74,13 @@ fun AnimalNetworkModel.toDomain(): Animal = Animal(
     evntImg = evntImg.orEmpty()
 )
 
-fun SidoNetworkModel.toDomain(): Sido = Sido(
-    orgCd = orgCd,
-    orgdownNm = orgdownNm
-)
+fun SidoNetworkModel.toDomain(): Sido = Sido(orgCd = orgCd, orgdownNm = orgdownNm)
+fun SidoEntity.toDomain(): Sido = Sido(orgCd = orgCd, orgdownNm = orgdownNm)
+fun Sido.toEntity(): SidoEntity = SidoEntity(orgCd = orgCd, orgdownNm = orgdownNm)
 
-fun SigunguNetworkModel.toDomain(): Sigungu = Sigungu(
-    orgCd = orgCd,
-    orgdownNm = orgdownNm,
-    uprCd = uprCd
-)
+fun SigunguNetworkModel.toDomain(): Sigungu = Sigungu(orgCd = orgCd, orgdownNm = orgdownNm, uprCd = uprCd)
+fun SigunguEntity.toDomain(): Sigungu = Sigungu(orgCd = orgCd, orgdownNm = orgdownNm, uprCd = uprCd)
+fun Sigungu.toEntity(): SigunguEntity = SigunguEntity(orgCd = orgCd, orgdownNm = orgdownNm, uprCd = uprCd)
 
 fun KindNetworkModel.toDomain(): Kind = Kind(
     kindCd = kindCd,
