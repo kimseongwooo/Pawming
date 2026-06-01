@@ -357,9 +357,7 @@ class HomeViewModel @Inject constructor(
                     }
                 },
                 onFailure = {
-                    _uiState.update {
-                        it.copy(isLoadingPickerItems = false)
-                    }
+                    _uiState.update { it.copy(isLoadingPickerItems = false) }
                 }
             )
         }

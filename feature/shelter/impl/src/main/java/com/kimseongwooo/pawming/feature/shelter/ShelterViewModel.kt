@@ -37,7 +37,7 @@ class ShelterViewModel @Inject constructor(
     val sideEffect = _sideEffect.receiveAsFlow()
 
     // 시도별 시군구 목록을 미리 보관 — 선택 시 즉시 조회
-    private var sigunguCache: Map<String, ImmutableList<Sigungu>> = emptyMap()
+    private val sigunguCache: MutableMap<String, ImmutableList<Sigungu>> = mutableMapOf()
 
     init {
         loadInitialData()
@@ -63,11 +63,12 @@ class ShelterViewModel @Inject constructor(
                 val cache = coroutineScope {
                     sidoList.map { sido ->
                         async {
-                            sido.orgCd to (getSigunguUseCase(sido.orgCd).getOrDefault(emptyList()).toImmutableList())
+                            sido.orgCd to (getSigunguUseCase(sido.orgCd).getOrDefault(emptyList())
+                                .toImmutableList())
                         }
                     }.awaitAll().toMap()
                 }
-                sigunguCache = cache
+                sigunguCache.putAll(cache)
             }
             _uiState.update { it.copy(isInitialLoading = false) }
         }
@@ -116,7 +117,12 @@ class ShelterViewModel @Inject constructor(
         viewModelScope.launch {
             getSheltersUseCase(uprCd = uprCd, orgCd = orgCd)
                 .onSuccess { list ->
-                    _uiState.update { it.copy(shelters = list.toImmutableList(), isShelterLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            shelters = list.toImmutableList(),
+                            isShelterLoading = false
+                        )
+                    }
                 }
                 .onFailure { e ->
                     _uiState.update { it.copy(isShelterLoading = false, error = e.message) }
