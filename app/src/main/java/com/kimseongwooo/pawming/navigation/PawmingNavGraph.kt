@@ -13,9 +13,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.kimseongwooo.pawming.designsystem.component.PawmingBottomNav
 import com.kimseongwooo.pawming.designsystem.component.PawmingBottomNavItem
-import com.kimseongwooo.pawming.designsystem.component.PawmingHeartIcon
-import com.kimseongwooo.pawming.designsystem.component.PawmingHomeIcon
-import com.kimseongwooo.pawming.designsystem.component.PawmingShelterIcon
 import com.kimseongwooo.pawming.feature.animaldetail.AnimalDetailRoute
 import com.kimseongwooo.pawming.feature.animaldetail.navigation.animalDetailNavEntries
 import com.kimseongwooo.pawming.feature.favorites.FavoritesRoute
@@ -30,8 +27,8 @@ import com.kimseongwooo.pawming.feature.shelterdetail.navigation.shelterDetailNa
 @Composable
 fun PawmingNavGraph() {
     var selectedTab by rememberSaveable { mutableStateOf(TopLevelTab.Home) }
-    var pendingShelterId by rememberSaveable { mutableStateOf("") }
-    var pendingShelterNm by rememberSaveable { mutableStateOf("") }
+    var pendingShelterId by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingShelterNm by rememberSaveable { mutableStateOf<String?>(null) }
 
     // 탭별 독립 backstack — @Serializable NavKey 덕분에 프로세스 재시작 후에도 복원됨
     val homeBackStack = rememberNavBackStack(HomeRoute)
@@ -52,7 +49,6 @@ fun PawmingNavGraph() {
 
     NavDisplay(
         backStack = activeBackStack,
-        onBack = { activeBackStack.removeLastOrNull() },
         sceneStrategies = listOf(
             PawmingSceneStrategy(
                 bottomBar = {
@@ -79,8 +75,8 @@ fun PawmingNavGraph() {
                 pendingShelterId = pendingShelterId,
                 pendingShelterNm = pendingShelterNm,
                 onShelterFilterApplied = {
-                    pendingShelterId = ""
-                    pendingShelterNm = ""
+                    pendingShelterId = null
+                    pendingShelterNm = null
                 },
                 metadata = topLevelMetadata()
             )
@@ -108,15 +104,3 @@ fun PawmingNavGraph() {
     )
 }
 
-private enum class TopLevelTab(val label: String) {
-    Home("홈"),
-    Favorites("즐겨찾기"),
-    Shelter("보호센터");
-
-    @Composable
-    fun Icon(active: Boolean) = when (this) {
-        Home -> PawmingHomeIcon(active = active)
-        Favorites -> PawmingHeartIcon(active = active)
-        Shelter -> PawmingShelterIcon(active = active)
-    }
-}

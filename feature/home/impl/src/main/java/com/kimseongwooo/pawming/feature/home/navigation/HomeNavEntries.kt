@@ -14,8 +14,8 @@ import com.kimseongwooo.pawming.feature.home.HomeIntent
 
 fun EntryProviderScope<NavKey>.homeNavEntries(
     onNavigateToAnimalDetail: (desertionNo: String) -> Unit,
-    pendingShelterId: String = "",
-    pendingShelterNm: String = "",
+    pendingShelterId: String? = null,
+    pendingShelterNm: String? = null,
     onShelterFilterApplied: () -> Unit = {},
     metadata: Map<String, Any> = emptyMap()
 ) {
@@ -33,11 +33,11 @@ fun EntryProviderScope<NavKey>.homeNavEntries(
         }
 
         LaunchedEffect(pendingShelterId) {
-            if (pendingShelterId.isNotEmpty()) {
+            pendingShelterId?.let { id ->
                 viewModel.handleIntent(
                     HomeIntent.ApplyExternalShelterFilter(
-                        careRegNo = pendingShelterId,
-                        careNm = pendingShelterNm
+                        careRegNo = id,
+                        careNm = pendingShelterNm.orEmpty()
                     )
                 )
                 onShelterFilterApplied()
